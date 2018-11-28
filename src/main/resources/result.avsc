@@ -1,0 +1,9 @@
+{
+     "type": "record",
+     "namespace": "com.data",
+     "name": "result",
+     "fields": [
+        { "name": "id", "type": "int" },
+        { "name": "hotel_cluster", "type": "int" }
+     ]
+}
