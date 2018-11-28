@@ -1,0 +1,31 @@
+{
+     "type": "record",
+     "namespace": "com.data",
+     "name": "destination",
+     "fields": [
+        { "name": "date_time", "type": "string" },
+        { "name": "site_name", "type": "string" },
+        { "name": "posa_continent", "type": "string" },
+        { "name": "user_location_country", "type": "string" },
+        { "name": "user_location_region", "type": "string" },
+        { "name": "user_location_city", "type": "string" },
+        { "name": "orig_destination_distance", "type": "string" },
+        { "name": "user_id", "type": "string" },
+        { "name": "is_mobile", "type": "string" },
+        { "name": "is_package", "type": "string" },
+        { "name": "channel", "type": "string" },
+        { "name": "srch_ci", "type": "string" },
+        { "name": "srch_co", "type": "string" },
+        { "name": "srch_adults_cnt", "type": "string" },
+        { "name": "srch_children_cnt", "type": "string" },
+        { "name": "srch_rm_cnt", "type": "string" },
+        { "name": "srch_destination_id", "type": "string" },
+        { "name": "srch_destination_type_id", "type": "string" },
+        { "name": "hotel_continent", "type": "string" },
+        { "name": "hotel_country", "type": "string" },
+        { "name": "hotel_market", "type": "string" },
+        { "name": "is_booking", "type": "string" },
+        { "name": "cnt", "type": "string" },
+        { "name": "hotel_cluster", "type": "string" }
+     ]
+}
