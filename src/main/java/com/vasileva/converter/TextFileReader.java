@@ -50,7 +50,6 @@ public class TextFileReader {
 
     private GenericRecord mapValues(String[] values, String[] header, Schema schema) {
         Preconditions.checkArgument(values.length == header.length, "Header and line sizes do not match");
-
         GenericRecord record = new GenericData.Record(schema);
         for (int i = 0; i < values.length; i++) {
             record.put(header[i], values[i]);

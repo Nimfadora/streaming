@@ -9,9 +9,10 @@ import java.io.IOException;
  */
 public enum SchemaType {
 
-    DESTINATION("destination.avsc"),
-    DATASET("dataset.avsc"),
-    RESULT("result.avsc");
+    DESTINATION("/destination.avsc"),
+    TEST_DATASET("/dataset_test.avsc"),
+    TRAIN_DATASET("/dataset_train.avsc"),
+    RESULT("/result.avsc");
 
     private final Schema schema;
 

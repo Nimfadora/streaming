@@ -21,10 +21,11 @@ public class Text2ParquetFileConverter {
     /**
      * Converts text file with header, where values in line are separated with delimiter to
      * parquet file with schema passed.
-     * @param inputPath input file path
+     *
+     * @param inputPath  input file path
      * @param outputPath output file path
      * @param schemaType input file schema type
-     * @param delimiter line values delimiter
+     * @param delimiter  line values delimiter
      * @throws IOException when exceptions while reading occurs
      */
     public void convert(String inputPath, String outputPath, String schemaType, String delimiter) throws IOException {
