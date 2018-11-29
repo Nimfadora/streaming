@@ -4,11 +4,13 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.List;
 
 public class Text2ParquetFileConverter {
+    private final static Logger LOG = Logger.getLogger(Text2ParquetFileConverter.class);
 
     private final TextFileReader fileReader;
     private final ParquetFileWriter fileWriter;
@@ -36,10 +38,12 @@ public class Text2ParquetFileConverter {
         } catch (IOException ex) {
             throw new IOException(String.format("Failed to read file: %s, message: %s", inputPath, ex.getMessage()), ex);
         }
+        LOG.info("Data is read successfully");
         try {
             fileWriter.writeToParquet(records, new Path(outputPath), schema);
         } catch (IOException ex) {
             throw new IOException(String.format("Failed to write data to parquet: %s, message: %s", outputPath, ex.getMessage()), ex);
         }
+        LOG.info("Data is written successfully");
     }
 }

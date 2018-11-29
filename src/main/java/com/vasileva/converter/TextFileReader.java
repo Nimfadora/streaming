@@ -10,12 +10,18 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.log4j.Logger;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class TextFileReader {
+    private final static Logger LOG = Logger.getLogger(TextFileReader.class);
+
 
     private final Configuration configuration;
 
@@ -36,20 +42,37 @@ public class TextFileReader {
         FileSystem fs = FileSystem.get(configuration);
         Preconditions.checkArgument(fs.exists(filePath), "File does not exist");
 
-        try (FSDataInputStream in = fs.open(filePath)) {
-            List<String> lines = IOUtils.readLines(in, Charsets.UTF_8);
-            Preconditions.checkArgument(lines.size() >= 2, "File is empty or missing header");
-            String[] header = lines.get(0).split(delimiter);
+        LOG.info("Starting to read data");
 
-            return lines.subList(1, lines.size()).stream()
-                    .map(line -> line.split(delimiter))
-                    .map(values -> mapValues(values, header, schema))
-                    .collect(Collectors.toList());
+        try (Scanner sc = new Scanner(fs.open(filePath), "UTF-8")) {
+            List<GenericRecord> records = new ArrayList<>();
+            String[] header = null;
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                LOG.info("Parsing line: " + line);
+
+                String[] values = line.split(delimiter, -1);
+                if(header == null) {
+                    header = values;
+                } else {
+                    Optional.ofNullable(mapValues(values, header, schema)).ifPresent(records::add);
+                }
+            }
+
+            if (sc.ioException() != null) {
+                throw new IOException("Exception occurred while reading: " + sc.ioException().getMessage(), sc.ioException());
+            }
+
+            Preconditions.checkArgument(records.size() > 0, "File is empty or missing header");
+            return records;
         }
     }
 
     private GenericRecord mapValues(String[] values, String[] header, Schema schema) {
-        Preconditions.checkArgument(values.length == header.length, "Header and line sizes do not match");
+        if(values.length != header.length) {
+            LOG.warn(String.format("Header and line sizes do not match: header[%s], line[%s]", header.length, values.length));
+            return null;
+        }
         GenericRecord record = new GenericData.Record(schema);
         for (int i = 0; i < values.length; i++) {
             record.put(header[i], values[i]);
