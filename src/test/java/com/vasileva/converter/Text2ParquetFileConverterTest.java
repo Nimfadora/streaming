@@ -9,9 +9,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.apache.parquet.avro.AvroParquetReader;
-import org.apache.parquet.hadoop.CodecFactory;
 import org.apache.parquet.hadoop.ParquetReader;
-import org.apache.parquet.hadoop.util.HadoopInputFile;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -80,8 +78,8 @@ public class Text2ParquetFileConverterTest {
         List<GenericRecord> results = new ArrayList<>();
 
         try (ParquetReader<GenericRecord> reader = AvroParquetReader
-                .<GenericRecord>builder(HadoopInputFile.fromPath(filePath, configuration))
-                .withCodecFactory(new CodecFactory(configuration, 100))
+                .<GenericRecord>builder(filePath)
+                .withConf(configuration)
                 .build()) {
             GenericRecord result;
             while ((result = reader.read()) != null) {

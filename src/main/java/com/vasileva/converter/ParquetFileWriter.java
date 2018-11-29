@@ -28,12 +28,9 @@ public class ParquetFileWriter {
      * @throws IOException when exceptions while reading occurs
      */
     public void writeToParquet(List<GenericRecord> data, Path filePath, Schema schema) throws IOException {
-        try (ParquetWriter<GenericRecord> writer = AvroParquetWriter
-                .<GenericRecord>builder(filePath)
-                .withSchema(schema)
-                .withConf(configuration)
-                .withCompressionCodec(CompressionCodecName.SNAPPY)
-                .build()) {
+        try (ParquetWriter<GenericRecord> writer = new AvroParquetWriter<>(filePath, schema,
+                CompressionCodecName.SNAPPY, ParquetWriter.DEFAULT_BLOCK_SIZE, ParquetWriter.DEFAULT_PAGE_SIZE,
+                true, configuration)) {
             for (GenericRecord record : data) {
                 writer.write(record);
             }
