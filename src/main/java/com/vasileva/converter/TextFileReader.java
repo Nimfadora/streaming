@@ -1,22 +1,19 @@
 package com.vasileva.converter;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 
-import java.io.*;
-import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class TextFileReader {
@@ -44,27 +41,14 @@ public class TextFileReader {
 
         LOG.info("Starting to read data");
 
-        try (Scanner sc = new Scanner(fs.open(filePath), "UTF-8")) {
-            List<GenericRecord> records = new ArrayList<>();
-            String[] header = null;
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-                LOG.info("Parsing line: " + line);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(fs.open(filePath)))) {
+            String header = reader.readLine();
+            Preconditions.checkArgument(header != null, "File is empty");
+            String[] headings = header.split(delimiter, -1);
 
-                String[] values = line.split(delimiter, -1);
-                if(header == null) {
-                    header = values;
-                } else {
-                    Optional.ofNullable(mapValues(values, header, schema)).ifPresent(records::add);
-                }
-            }
-
-            if (sc.ioException() != null) {
-                throw new IOException("Exception occurred while reading: " + sc.ioException().getMessage(), sc.ioException());
-            }
-
-            Preconditions.checkArgument(records.size() > 0, "File is empty or missing header");
-            return records;
+            return reader.lines()
+                    .map(l -> mapValues(l.split(delimiter, -1), headings, schema))
+                    .filter(Objects::nonNull).collect(Collectors.toList());
         }
     }
 
