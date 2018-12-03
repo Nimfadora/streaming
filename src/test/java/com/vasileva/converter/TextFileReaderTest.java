@@ -63,7 +63,7 @@ public class TextFileReaderTest {
             "data/destinations.csv, /records/destinations_records.txt, DESTINATION",
             "data/sample_submission.csv, /records/results_records.txt, RESULT"})
     public void testReadFile(String inputPath, String expectedPath, String schemaType) throws IOException {
-        List<GenericRecord> records = fileReader.readFile(getHdfsFilePath(fs, inputPath),
+        List<GenericRecord> records = fileReader.mapText2GenericRecord(getHdfsFilePath(fs, inputPath),
                 SchemaType.valueOf(schemaType).getSchema(), ",");
 
         assertFalse(records.isEmpty());
@@ -77,17 +77,17 @@ public class TextFileReaderTest {
 
     @Test(expected = AvroRuntimeException.class)
     public void testInvalidSchemaPassed() throws IOException {
-        fileReader.readFile(getHdfsFilePath(fs, "data/test.csv"), SchemaType.TRAIN_DATASET.getSchema(), ",");
+        fileReader.mapText2GenericRecord(getHdfsFilePath(fs, "data/test.csv"), SchemaType.TRAIN_DATASET.getSchema(), ",");
     }
 
     @Test(expected = AvroRuntimeException.class)
     public void testInvalidDelimiterPassed() throws IOException {
-        fileReader.readFile(getHdfsFilePath(fs, "data/test.csv"), SchemaType.TEST_DATASET.getSchema(), ";");
+        fileReader.mapText2GenericRecord(getHdfsFilePath(fs, "data/test.csv"), SchemaType.TEST_DATASET.getSchema(), ";");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testInputDoesNotExist() throws IOException {
-        fileReader.readFile(getHdfsFilePath(fs, "data/abrakadkabra.csv"), SchemaType.TRAIN_DATASET.getSchema(), ",");
+        fileReader.mapText2GenericRecord(getHdfsFilePath(fs, "data/abrakadkabra.csv"), SchemaType.TRAIN_DATASET.getSchema(), ",");
     }
 
     private static void createInput() throws IOException {

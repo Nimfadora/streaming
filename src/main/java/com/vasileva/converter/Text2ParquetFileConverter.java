@@ -34,7 +34,7 @@ public class Text2ParquetFileConverter {
         Schema schema = SchemaType.valueOf(schemaType).getSchema();
         List<GenericRecord> records;
         try {
-            records = fileReader.readFile(new Path(inputPath), schema, delimiter);
+            records = fileReader.mapText2GenericRecord(new Path(inputPath), schema, delimiter);
         } catch (IOException ex) {
             throw new IOException(String.format("Failed to read file: %s, message: %s", inputPath, ex.getMessage()), ex);
         }

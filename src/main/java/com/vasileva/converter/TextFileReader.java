@@ -35,7 +35,7 @@ public class TextFileReader {
      * @return list of mapped records
      * @throws IOException when exceptions while reading occurs
      */
-    public List<GenericRecord> readFile(Path filePath, Schema schema, String delimiter) throws IOException {
+    public List<GenericRecord> mapText2GenericRecord(Path filePath, Schema schema, String delimiter) throws IOException {
         FileSystem fs = FileSystem.get(configuration);
         Preconditions.checkArgument(fs.exists(filePath), "File does not exist");
 
