@@ -33,13 +33,10 @@ object TopSearchedNotBookedHotels {
     * @return top three most popular not booked hotels within people with children
     */
   def getTopNotBookedHotelsByPeopleWithChildren(data: Dataset[Row]): Dataset[Row] = {
-    data.filter(col("srch_children_cnt") > 0)
-      .select(col("hotel_continent"), col("hotel_country"), col("hotel_market"),
-        col("is_booking"), lit(1).as("searches_count"))
+    data.filter(col("srch_children_cnt") > 0 && col("is_booking") === 0)
+      .select(col("hotel_continent"), col("hotel_country"), col("hotel_market"), lit(1).as("searches_count"))
       .groupBy(col("hotel_continent"), col("hotel_country"), col("hotel_market"))
-      .agg(sum(col("searches_count")).as("searches_count"), sum(col("is_booking")).as("bookings_count"))
-      .filter(col("bookings_count") === 0)
-      .select(col("hotel_continent"), col("hotel_country"), col("hotel_market"), col("searches_count"))
+      .agg(sum(col("searches_count")).as("searches_count"))
       .sort(col("searches_count").desc)
       .limit(3)
   }

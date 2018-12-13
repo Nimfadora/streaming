@@ -21,8 +21,8 @@ class TopSearchedNotBookedHotelsTest extends FunSuite with BeforeAndAfter {
     val topHotels = TopSearchedNotBookedHotels.getTopNotBookedHotelsByPeopleWithChildren(data).collect
     val expectedTopHotels = Array(
       Row.apply("3", "151", "69", 17),
-      Row.apply("2", "50", "675", 6),
-      Row.apply("2", "50", "191", 4))
+      Row.apply("2", "50", "680", 8),
+      Row.apply("2", "50", "675", 6))
 
     assert(topHotels.length === 3)
     assert(topHotels.deep === expectedTopHotels.deep)
