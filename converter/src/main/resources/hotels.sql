@@ -50,7 +50,19 @@ INTO 5 BUCKETS
 STORED AS ORC;
 
 -- Inserting data into partitioned and bucketed table for more fast querying and compact storage.
-INSERT OVERWRITE TABLE train_dataset_orc PARTITION(is_booking) SELECT * FROM train_dataset_ext;
+INSERT OVERWRITE TABLE train_dataset_orc PARTITION(is_booking=1)
+SELECT date_time, site_name, posa_continent, user_location_country, user_location_region, user_location_city, orig_destination_distance,
+ user_id, is_mobile, is_package, channel, srch_ci, srch_co, srch_adults_cnt, srch_children_cnt, srch_rm_cnt, srch_destination_id,
+ srch_destination_type_id, cnt, hotel_continent, hotel_country, hotel_market, hotel_cluster FROM train_dataset_ext
+WHERE is_booking=1
+ORDER BY hotel_continent, hotel_country, hotel_market, hotel_cluster;
+
+INSERT OVERWRITE TABLE train_dataset_orc PARTITION(is_booking=0)
+SELECT date_time, site_name, posa_continent, user_location_country, user_location_region, user_location_city, orig_destination_distance,
+ user_id, is_mobile, is_package, channel, srch_ci, srch_co, srch_adults_cnt, srch_children_cnt, srch_rm_cnt, srch_destination_id,
+ srch_destination_type_id, cnt, hotel_continent, hotel_country, hotel_market, hotel_cluster FROM train_dataset_ext
+WHERE is_booking=0
+ORDER BY hotel_continent, hotel_country, hotel_market, hotel_cluster;
 
 -- Creating external table for test dataset csv file.
 CREATE EXTERNAL TABLE IF NOT EXISTS test_dataset_ext (
@@ -106,6 +118,7 @@ LOAD DATA INPATH "/user/root/hive/destinations/destinations.csv" INTO TABLE dest
 
 -- Queries
 
+-- Task 1
 -- We select countries with the biggest number of search requests with successful booking result.
 SELECT hotel_country, COUNT(*) as search_req_count FROM train_dataset_orc
 WHERE is_booking=1
@@ -113,11 +126,17 @@ GROUP BY hotel_country
 ORDER BY search_req_count DESC
 LIMIT 3;
 
+-- Task 2
 -- We use Hive DATEDIFF function to get period of stay specified in search request. We selecting MAX
 -- period of stay from those couples (2 adults) with at least one child.
-SELECT MAX(DATEDIFF(srch_co, srch_ci)) as period_of_stay_days FROM train_dataset_orc
+-- This query is executed over external table as there is some bug in hive or Ambari that skips the
+-- real longest period of stay from results when executing over ORC managed hive table. The situation
+-- was investigated, table contains such row, but somehow does not take it to account. Screenshots of
+-- this situation are attached to the archive with screenshots.
+SELECT MAX(DATEDIFF(srch_co, srch_ci)) as period_of_stay_days FROM train_dataset_ext
 WHERE srch_adults_cnt = 2 AND srch_children_cnt > 0;
 
+-- Task 3 (exclusive)
 -- In subquery we select all hotels that have at least one successful booking (this subquery is pretty fast,
 -- as we have partitioning by is_booking field and there is much less successful bookings than not successful).
 -- Then we subtract all this hotels with successful bookings from all other by doing LEFT JOIN and , and
@@ -136,5 +155,15 @@ WHERE booked.hotel_continent IS NULL
 AND booked.hotel_country IS NULL
 AND booked.hotel_market IS NULL
 GROUP BY all_hotels.hotel_continent, all_hotels.hotel_country, all_hotels.hotel_market
+ORDER BY searches_count DESC
+LIMIT 3;
+
+-- Task 3 (inclusive)
+-- We filter all request which bookings were not successful and sort by number of requests descending,
+-- limiting the output to top three hotels with largest number of such requests.
+SELECT hotel_continent, hotel_country, hotel_market, COUNT(*) as searches_count
+FROM train_dataset_orc
+WHERE is_booking=0
+GROUP BY hotel_continent, hotel_country, hotel_market
 ORDER BY searches_count DESC
 LIMIT 3;
