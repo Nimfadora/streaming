@@ -1,4 +1,4 @@
-package com.vasileva.streaming
+package com.vasileva.streaming.producer
 
 import org.apache.kafka.clients.producer.{MockProducer, ProducerRecord}
 import org.apache.kafka.common.serialization.StringSerializer

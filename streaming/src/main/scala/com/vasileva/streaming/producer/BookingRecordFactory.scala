@@ -1,4 +1,4 @@
-package com.vasileva.streaming
+package com.vasileva.streaming.producer
 
 import java.util.Date
 import java.util.concurrent.ThreadLocalRandom
