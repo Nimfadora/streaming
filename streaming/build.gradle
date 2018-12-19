@@ -1,0 +1,28 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "4.0.3"
+    id 'scala'
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+group = "com.vasileva"
+version = "1.0"
+
+dependencies {
+    compile 'org.scala-lang:scala-library:2.11.12'
+    compileOnly group: 'org.apache.kafka', name: 'kafka-clients', version: '1.0.0'
+    compileOnly group: 'org.apache.spark', name: 'spark-core_2.11', version: '2.3.2'
+    compileOnly group: 'org.apache.spark', name: 'spark-sql_2.11', version: '2.3.2'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    compile group: 'org.apache.spark', name: 'spark-streaming-kafka-0-10_2.11', version: '2.3.2'
+    compileOnly group: 'org.apache.spark', name: 'spark-streaming_2.11', version: '2.3.2'
+    testCompile group: 'org.scalatest', name: 'scalatest_2.12', version: '3.0.5'
+}
+
+jar {
+    baseName = 'batch-consumer'
+    version = '1.0'
+}
