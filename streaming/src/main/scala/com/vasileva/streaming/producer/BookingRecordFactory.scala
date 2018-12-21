@@ -6,6 +6,9 @@ import java.util.concurrent.ThreadLocalRandom
 import org.apache.commons.lang3.time.FastDateFormat
 import org.apache.commons.math3.util.Precision
 
+/**
+  * Generates booking record with random but realistic content
+  */
 object BookingRecordFactory {
   private val dateFmt = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss")
   private val intervalStart: Date = dateFmt.parse("2013-01-01 00:00:00")
@@ -13,6 +16,11 @@ object BookingRecordFactory {
   private val requestMaxDate: Date = dateFmt.parse("2015-11-31 00:00:00")
   private val MAX_INDEX = 10000
 
+  /**
+    * Generate random booking record.
+    *
+    * @return booking record comma-delimited string
+    */
   def generateRecord(): String = {
     val random = ThreadLocalRandom.current
     val requestTime = new Date(random.nextLong(intervalStart.getTime, requestMaxDate.getTime))

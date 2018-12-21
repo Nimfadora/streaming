@@ -5,6 +5,9 @@ import java.util.concurrent.{Executors, TimeUnit}
 
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig}
 
+/**
+  * Produces booking records in several threads and sends them to kafka topic specified
+  */
 object ProducerMain {
 
   def main(args: Array[String]): Unit = {
